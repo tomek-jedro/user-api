@@ -21,8 +21,9 @@ object Endpoints {
       .in("api" / "user" / "get" / "all")
       .out(jsonBody[List[User]])
 
-  implicit val yearCodec: PlainCodec[Gender] =
-    implicitly[PlainCodec[String]].map(Gender.withName(_))(_.toString)
+  implicit val genderCodec: PlainCodec[Gender] =
+    implicitly[PlainCodec[String]]
+      .map(g => Gender.withName(g.toUpperCase))(_.toString.toUpperCase)
 
   val selectUsersEndpoint: PublicEndpoint[
     (

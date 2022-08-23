@@ -28,7 +28,7 @@ object Main extends App {
   implicit val system: ActorSystem[Nothing] =
     ActorSystem(Behaviors.empty, "system")
 
-  val logger = Logger("mylogger")
+  val logger = Logger(Main.getClass)
 
   val config: Config = ConfigFactory.load()
 

@@ -1,5 +1,8 @@
 # USER API
 
+####CREATE IMAGE sbt docker:publishLocal
+####RUN APP WITH cd docker && docker-compose up -d
+
 # DOCS
 
 ##http://localhost:8080/docs/

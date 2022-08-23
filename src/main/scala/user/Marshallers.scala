@@ -18,8 +18,8 @@ object Marshallers
 
     override def read(json: JsValue): Gender =
       json match {
-        case JsString(s) if s.toUpperCase == "MALE"   => Gender.Male
-        case JsString(s) if s.toUpperCase == "FEMALE" => Gender.Female
+        case JsString(s) if s.toUpperCase == "MALE"   => Gender.MALE
+        case JsString(s) if s.toUpperCase == "FEMALE" => Gender.FEMALE
         case _                                        => throw new Exception("Malformed gender")
       }
 
