@@ -2,7 +2,7 @@ package user
 
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import models.Gender.Gender
-import models.{Gender, PageRequest, SortParams, UpdateUserRequest, User}
+import models.{Gender, PageRequest, SortParams, User}
 import spray.json.{JsValue, RootJsonFormat, _}
 import sttp.tapir.json.spray.TapirJsonSpray
 import slick.ast.Ordering
@@ -48,10 +48,5 @@ object Marshallers
   implicit val pageRequestFormat: RootJsonFormat[PageRequest] = jsonFormat3(
     PageRequest.apply
   )
-
-  implicit val userUpdateRequestFormat: RootJsonFormat[UpdateUserRequest] =
-    jsonFormat2(
-      UpdateUserRequest.apply
-    )
 
 }

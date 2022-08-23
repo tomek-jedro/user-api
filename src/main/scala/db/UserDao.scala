@@ -1,6 +1,6 @@
 package db
 
-import models.{PageRequest, SelectQueryParameters, UpdateUserRequest, User}
+import models.{PageRequest, SelectQueryParameters, User}
 import slick.ast.Ordering.Direction
 
 import scala.concurrent.Future
@@ -18,13 +18,14 @@ class UserDao(db: Database) extends Dao[User] {
   }
 
   override def update(
-      updateUserRequest: UpdateUserRequest
-  ): Future[Int] = {
-    val user = updateUserRequest.newUser.copy(id = Some(updateUserRequest.id))
+      id: Long,
+      user: User
+  ): Future[Option[User]] = {
     val q = userTable
-      .insertOrUpdate(user)
+      .insertOrUpdate(user.copy(id = Some(id)))
 
     db.run(q)
+    get(id)
   }
 
   override def save(t: User): Future[Option[Long]] =

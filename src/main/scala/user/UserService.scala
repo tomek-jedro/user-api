@@ -8,11 +8,10 @@ import models.SelectQueryParameters
 import sttp.tapir.server.akkahttp.AkkaHttpServerInterpreter
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.util._
 
 class UserService(userDao: UserDao) {
-
-  val logger: Logger = Logger("Routes")
 
   val getUser = Endpoints.getUserEndpoint.serverLogic { id =>
     Right(userDao.get(id)).withLeft[Unit].sequence
@@ -24,8 +23,6 @@ class UserService(userDao: UserDao) {
 
   val selectUsers = Endpoints.selectUsersEndpoint
     .serverLogic(in => {
-      println("XXXXX")
-      println(in)
       val (pageRequest, mbyIds, mbyFirstName, mbyLastName, mbyGender) = in
 
       val queryParameters = SelectQueryParameters(
@@ -43,7 +40,8 @@ class UserService(userDao: UserDao) {
 
   def updateUser =
     Endpoints.updateUserEndpoint.serverLogic { in =>
-      Right(userDao.update(in)).withLeft[Unit].sequence
+      val (id, user) = in
+      Right(userDao.update(id, user)).withLeft[Unit].sequence
     }
 
   def deleteUser =
@@ -53,8 +51,12 @@ class UserService(userDao: UserDao) {
 
   def addUser =
     Endpoints.addUserEndpoint.serverLogic { in =>
-      println(in)
-      Right(userDao.save(in)).withLeft[Unit].sequence
+      val futureMbyId = userDao.save(in)
+      val futureMbyUser = futureMbyId.map {
+        case Some(id) => userDao.get(id)
+        case _        => Future.successful(None)
+      }.flatten
+      Right(futureMbyUser).withLeft[Unit].sequence
     }
 
   val toRoute: Route = AkkaHttpServerInterpreter().toRoute(

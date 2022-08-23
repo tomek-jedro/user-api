@@ -42,7 +42,7 @@ object Main extends App {
         Endpoints.updateUserEndpoint,
         Endpoints.addUserEndpoint
       ),
-      "My App",
+      "User API",
       "1.0"
     )
 

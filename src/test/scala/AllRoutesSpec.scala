@@ -13,9 +13,6 @@ class AllRoutesSpec
     with ScalatestRouteTest
     with BeforeAndAfterAll {
 
-//  val initScriptPath = getClass.getResource("init.sql").getPath
-  //  val initScriptRelativePath = "/../resources/init.sql"
-
   private val initScriptParam =
     JdbcDatabaseContainer.CommonParams(initScriptPath = Option("init.sql"))
 

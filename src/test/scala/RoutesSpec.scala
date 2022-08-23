@@ -7,7 +7,6 @@ import models.User
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import slick.ast.Ordering
 
 class RoutesSpec(userRoute: Route)
     extends AnyFlatSpec
@@ -33,7 +32,7 @@ class RoutesSpec(userRoute: Route)
       |""".stripMargin
 
   it should "fetch first user" in {
-    Get("/api/user/get/1") ~> userRoute ~> check {
+    Get("/api/user/1") ~> userRoute ~> check {
       val user = responseAs[User]
       user.firstName should not be empty
       user.lastName should not be empty
@@ -44,15 +43,17 @@ class RoutesSpec(userRoute: Route)
   }
 
   it should "save user" in {
-    Post("/api/user/save").withEntity(
+    Post("/api/user").withEntity(
       ContentTypes.`application/json`,
       userEntity
     ) ~> userRoute ~> check {
 
-      val futureId = Unmarshal(responseAs[String]).to[Long]
+      val futureUser = Unmarshal(responseAs[User]).to[User]
 
-      ScalaFutures.whenReady(futureId) { id =>
-        assert(id > 1)
+      ScalaFutures.whenReady(futureUser) { user =>
+        user.firstName shouldEqual "T"
+        user.lastName shouldEqual "J"
+        user.age shouldEqual 23
       }
       contentType shouldBe ContentTypes.`application/json`
       status shouldEqual StatusCodes.OK
@@ -61,7 +62,7 @@ class RoutesSpec(userRoute: Route)
   }
 
   it should "fetch all users" in {
-    Get("/api/user/get/all").withEntity(
+    Get("/api/users").withEntity(
       ContentTypes.`application/json`,
       pageRequestEntity
     ) ~> userRoute ~> check {
@@ -105,14 +106,14 @@ class RoutesSpec(userRoute: Route)
   }
 
   it should "delete user" in {
-    Get("/api/user/delete/1") ~> userRoute ~> check {
+    Delete("/api/user/1") ~> userRoute ~> check {
       val deleted = Unmarshal(responseAs[String]).to[Long]
       ScalaFutures.whenReady(deleted) { d =>
         d shouldEqual 1
       }
       status shouldEqual StatusCodes.OK
     }
-    Get("/api/user/get/1") ~> userRoute ~> check {
+    Get("/api/user/1") ~> userRoute ~> check {
       val user = responseAs[String]
       user shouldBe empty
       status shouldEqual StatusCodes.OK

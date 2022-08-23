@@ -1,6 +1,6 @@
 package user
 
-import models.{Gender, PageRequest, UpdateUserRequest, User}
+import models.{Gender, PageRequest, User}
 import sttp.tapir._
 import sttp.tapir.generic.auto._
 import sttp.tapir.Codec.PlainCodec
@@ -11,14 +11,14 @@ object Endpoints {
 
   val getUserEndpoint: PublicEndpoint[Long, Unit, Option[User], Any] =
     endpoint.get
-      .in("api" / "user" / "get" / path[Long]("userId"))
+      .in("api" / "user" / path[Long]("userId"))
       .out(jsonBody[Option[User]])
 
   val getAllUsersEndpoint
       : PublicEndpoint[Option[PageRequest], Unit, List[User], Any] =
     endpoint.get
       .in(jsonBody[Option[PageRequest]])
-      .in("api" / "user" / "get" / "all")
+      .in("api" / "users")
       .out(jsonBody[List[User]])
 
   implicit val genderCodec: PlainCodec[Gender] =
@@ -47,21 +47,23 @@ object Endpoints {
       .in(query[Option[Gender]]("gender"))
       .out(jsonBody[List[User]])
 
-  val updateUserEndpoint: PublicEndpoint[UpdateUserRequest, Unit, Int, Any] =
-    endpoint.get
-      .in("api" / "user" / "update")
-      .in(jsonBody[UpdateUserRequest])
-      .out(jsonBody[Int])
+  val updateUserEndpoint
+      : PublicEndpoint[(Long, User), Unit, Option[User], Any] =
+    endpoint.post
+      .in("api" / "user" / path[Long]("id"))
+      .in(jsonBody[User])
+      .out(jsonBody[Option[User]])
 
   val deleteUserEndpoint: PublicEndpoint[Long, Unit, Int, Any] =
-    endpoint.get
-      .in("api" / "user" / "delete" / path[Long]("id"))
-      .out(jsonBody[Int])
+    endpoint.delete
+      .in("api" / "user" / path[Long]("id"))
+      .out(plainBody[Int])
+      .description("Returns number of affected rows.")
 
-  val addUserEndpoint: PublicEndpoint[User, Unit, Option[Long], Any] =
+  val addUserEndpoint: PublicEndpoint[User, Unit, Option[User], Any] =
     endpoint.post
-      .in("api" / "user" / "save")
+      .in("api" / "user")
       .in(jsonBody[User])
-      .out(jsonBody[Option[Long]])
+      .out(jsonBody[Option[User]])
 
 }
